@@ -49,12 +49,13 @@ endif()
 if(imgui_USE_GLBINDING)
 	find_package(glbinding CONFIG REQUIRED)
 	target_link_libraries(imgui PUBLIC glbinding::glbinding glbinding::glbinding-aux)
+	target_compile_definitions(imgui PUBLIC IMGUI_USE_GLBINDING)
 endif()
 
 if(imgui_USE_SDL2)
 	find_package(SDL2 CONFIG REQUIRED)
 	target_link_libraries(imgui PRIVATE SDL2::SDL2)
-
+	target_compile_definitions(imgui PUBLIC IMGUI_USE_SDL2)
 	target_sources(imgui PRIVATE
 		"imgui/backends/imgui_impl_sdl.cpp"
 		"imgui/backends/imgui_impl_sdl.h"
@@ -62,7 +63,7 @@ if(imgui_USE_SDL2)
 elseif(imgui_USE_GLFW)
 	find_package(glfw3 CONFIG REQUIRED)
 	target_link_libraries(imgui PRIVATE glfw)
-
+	target_compile_definitions(imgui PUBLIC IMGUI_USE_GLFW)
 	target_sources(imgui PRIVATE
 		"imgui/backends/imgui_impl_glfw.cpp"
 		"imgui/backends/imgui_impl_glfw.h"
