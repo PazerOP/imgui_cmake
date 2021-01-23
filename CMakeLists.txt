@@ -55,8 +55,18 @@ if(imgui_USE_SDL2)
 	find_package(SDL2 CONFIG REQUIRED)
 	target_link_libraries(imgui PRIVATE SDL2::SDL2)
 
-	target_sources(imgui PRIVATE "imgui/backends/imgui_impl_sdl.cpp")
-	target_sources(imgui PRIVATE "imgui/backends/imgui_impl_sdl.h")
+	target_sources(imgui PRIVATE
+		"imgui/backends/imgui_impl_sdl.cpp"
+		"imgui/backends/imgui_impl_sdl.h"
+	)
+elseif(imgui_USE_GLFW)
+	find_package(glfw3 CONFIG REQUIRED)
+	target_link_libraries(imgui PRIVATE glfw)
+
+	target_sources(imgui PRIVATE
+		"imgui/backends/imgui_impl_glfw.cpp"
+		"imgui/backends/imgui_impl_glfw.h"
+	)
 endif()
 
 target_include_directories(imgui PUBLIC
