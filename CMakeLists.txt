@@ -35,7 +35,7 @@ if(imgui_USE_OPENGL2)
 	target_compile_definitions(imgui PUBLIC "IMGUI_USE_OPENGL2")
 
 	if (WIN32)
-		target_link_libraries(imgui PUBLIC "OpenGL32.lib")
+		target_link_libraries(imgui PRIVATE "OpenGL32.lib")
 	endif()
 endif()
 
@@ -48,8 +48,12 @@ endif()
 
 if(imgui_USE_GLBINDING)
 	find_package(glbinding CONFIG REQUIRED)
-	target_link_libraries(imgui PUBLIC glbinding::glbinding glbinding::glbinding-aux)
+	target_link_libraries(imgui PRIVATE glbinding::glbinding)
 	target_compile_definitions(imgui PUBLIC IMGUI_USE_GLBINDING)
+elseif(imgui_USE_GLAD2)
+	find_package(glad2 REQUIRED)
+	target_link_libraries(imgui PRIVATE glad2::glad2)
+	target_compile_definitions(imgui PUBLIC IMGUI_USE_GLAD2)
 endif()
 
 if(imgui_USE_SDL2)
