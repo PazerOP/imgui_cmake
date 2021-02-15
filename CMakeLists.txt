@@ -28,6 +28,12 @@ add_library(imgui
 	"imgui/misc/cpp/imgui_stdlib.h"
 )
 
+if (BUILD_SHARED_LIBS)
+	include(GenerateExportHeader)
+	generate_export_header(imgui EXPORT_MACRO_NAME IMGUI_API)
+	target_precompile_headers(imgui PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/imgui_export.h")
+endif()
+
 if(imgui_USE_OPENGL2)
 	target_sources(imgui PRIVATE "imgui/backends/imgui_impl_opengl2.cpp")
 	target_sources(imgui PRIVATE "imgui/backends/imgui_impl_opengl2.h")
