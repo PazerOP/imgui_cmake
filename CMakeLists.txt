@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(imgui)
+project(
+	imgui
+	VERSION 1.80
+	DESCRIPTION "CMake wrapper for Dear ImGui"
+	HOMEPAGE_URL https://github.com/PazerOP/imgui_cmake
+	LANGUAGES CXX
+)
 
 if (POLICY CMP0077)
 	# Allow CMake 3.13+ to override options when using FetchContent / add_subdirectory.
@@ -35,10 +41,11 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 if(imgui_USE_OPENGL2)
-	target_sources(imgui PRIVATE "imgui/backends/imgui_impl_opengl2.cpp")
-	target_sources(imgui PRIVATE "imgui/backends/imgui_impl_opengl2.h")
-
 	target_compile_definitions(imgui PUBLIC "IMGUI_USE_OPENGL2")
+	target_sources(imgui PRIVATE
+		"imgui/backends/imgui_impl_opengl2.cpp"
+		"imgui/backends/imgui_impl_opengl2.h"
+	)
 
 	if (WIN32)
 		target_link_libraries(imgui PRIVATE "OpenGL32.lib")
@@ -46,10 +53,11 @@ if(imgui_USE_OPENGL2)
 endif()
 
 if(imgui_USE_OPENGL3)
-	target_sources(imgui PRIVATE "imgui/backends/imgui_impl_opengl3.cpp")
-	target_sources(imgui PRIVATE "imgui/backends/imgui_impl_opengl3.h")
-
 	target_compile_definitions(imgui PUBLIC "IMGUI_USE_OPENGL3")
+	target_sources(imgui PRIVATE
+		"imgui/backends/imgui_impl_opengl3.cpp"
+		"imgui/backends/imgui_impl_opengl3.h"
+	)
 endif()
 
 if(imgui_USE_GLBINDING)
@@ -81,6 +89,46 @@ elseif(imgui_USE_GLFW)
 endif()
 
 target_include_directories(imgui PUBLIC
-	"imgui"
-	"imgui/misc/cpp"
+	"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui>" "$<INSTALL_INTERFACE:include/imgui>"
+	"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/misc/cpp>" "$<INSTALL_INTERFACE:include/imgui/misc/cpp>"
+)
+
+###########################################
+# "install" is intended for vcpkg support #
+###########################################
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
+configure_package_config_file(
+	cmake/config.cmake.in
+	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+	INSTALL_DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}"
+)
+
+write_basic_package_version_file(
+	"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+	VERSION ${PROJECT_VERSION}
+	COMPATIBILITY SameMajorVersion
+)
+
+install(
+	FILES
+		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+		"${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+	DESTINATION
+		"${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}"
+)
+
+
+install(TARGETS imgui EXPORT ${PROJECT_NAME}_targets)
+install(
+	EXPORT ${PROJECT_NAME}_targets
+	# NAMESPACE mh::
+	DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}"
+)
+
+file(GLOB IMGUI_HEADERS "imgui/*.h")
+file(GLOB IMGUI_HEADERS_MISC "imgui/misc/cpp/*.h")
+install(FILES ${IMGUI_HEADERS} ${IMGUI_HEADERS_MISC}
+	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/imgui/"
 )
